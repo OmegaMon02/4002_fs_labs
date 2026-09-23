@@ -4,6 +4,12 @@ export interface Employee {
   lastName: string;
 }
 
+export interface Role {
+  firstName: string;
+  lastName: string;
+  role: string;
+}
+
 export interface Department {
   name: string;
   employees: Employee[];

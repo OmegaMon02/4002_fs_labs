@@ -59,6 +59,28 @@ h1 {
 	font-size: clamp(1rem, 1.8vw, 1.25rem);
 }
 
+.site-nav {
+	display: flex;
+	gap: 1.5rem;
+	margin-bottom: 3rem;
+}
+
+.site-nav a {
+	padding-bottom: .35rem;
+	border-bottom: 1px solid transparent;
+	color: #c4d1dc;
+	font: 500 .78rem var(--mono-font);
+	letter-spacing: .08em;
+	text-decoration: none;
+	text-transform: uppercase;
+}
+
+.site-nav a:hover,
+.site-nav a.active {
+	border-color: #16a68d;
+	color: var(--white);
+}
+
 /* Directory layout */
 .directory {
 	width: min(86rem, calc(100% - 3rem));
@@ -87,6 +109,35 @@ h1 {
 	grid-template-columns: repeat(12, 1fr);
 	gap: 1rem;
 	padding-top: 1rem;
+}
+
+.organization {
+	width: min(86rem, calc(100% - 3rem));
+	margin: 0 auto;
+	padding: 2rem 0 5rem;
+}
+
+.role-list {
+	margin-top: 1rem;
+	border-top: 1px solid var(--line);
+}
+
+.role-row {
+	display: grid;
+	grid-template-columns: minmax(12rem, 1fr) minmax(18rem, 2fr);
+	gap: 2rem;
+	padding: 1rem 1.25rem;
+	border-bottom: 1px solid var(--line);
+	background: rgba(255, 255, 255, .72);
+}
+
+.role-name {
+	color: var(--navy);
+	font-weight: 700;
+}
+
+.role-title {
+	color: var(--muted-blue);
 }
 
 .department {
@@ -262,6 +313,10 @@ footer {
 		width: min(100% - 2rem, 40rem);
 	}
 
+	.organization {
+		width: min(100% - 2rem, 40rem);
+	}
+
 	.directory-summary {
 		flex-direction: column;
 		gap: .5rem;
@@ -275,6 +330,12 @@ footer {
 	.add-employee {
 		width: min(100% - 2rem, 40rem);
 		padding: 1.25rem;
+	}
+
+	.role-row {
+		grid-template-columns: 1fr;
+		gap: .35rem;
+		padding: .9rem 0;
 	}
 
 	.add-employee-intro,
