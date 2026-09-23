@@ -19,8 +19,13 @@ jobs:
           git config --global user.name "GitHub Action"
           git config --global user.email "action@github.com"
 
+          if [ -z "$API_TOKEN_GITHUB" ]; then
+            echo "TARGET_REPO_TOKEN is not configured for this repository."
+            exit 1
+          fi
+
           # Clone the target repository into a temporary folder
-          git clone https://x-access-token:${API_TOKEN_GITHUB}@github.com/OmegaMon02/4002_fs_labs_vercel.git target-folder
+          git clone "https://x-access-token:${API_TOKEN_GITHUB}@github.com/OmegaMon02/4002_fs_labs_vercel.git" target-folder
 
           # Copy the source files without replacing the target repository metadata
           rsync -av --exclude='.git' ./ target-folder/
