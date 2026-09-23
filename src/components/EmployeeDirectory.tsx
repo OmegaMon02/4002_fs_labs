@@ -1,8 +1,12 @@
 import type { ReactElement } from 'react';
-import { departments } from '../data/departments';
+import type { Department } from '../types';
 import { DepartmentSection } from './DepartmentSection';
 
-export function EmployeeDirectory(): ReactElement {
+interface EmployeeDirectoryProps {
+  departments: Department[];
+}
+
+export function EmployeeDirectory({ departments }: EmployeeDirectoryProps): ReactElement {
   const employeeCount = departments.reduce((total, department) => total + department.employees.length, 0);
 
   return (
