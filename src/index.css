@@ -157,6 +157,90 @@ li:last-child {
 	font-weight: 700;
 }
 
+/* Add employee form */
+.add-employee {
+	width: min(86rem, calc(100% - 3rem));
+	margin: 0 auto 5rem;
+	padding: 2rem;
+	border-top: 2px solid var(--navy);
+	background: var(--white);
+}
+
+.add-employee-intro {
+	display: flex;
+	align-items: baseline;
+	gap: 1rem;
+	margin-bottom: 1.5rem;
+}
+
+.section-label,
+.optional {
+	color: var(--muted-blue);
+	font: 500 .72rem/1.4 var(--mono-font);
+	letter-spacing: .08em;
+	text-transform: uppercase;
+}
+
+.add-employee form {
+	display: grid;
+	grid-template-columns: repeat(4, 1fr) auto;
+	align-items: start;
+	gap: 1rem;
+}
+
+.add-employee label {
+	display: grid;
+	gap: .45rem;
+	color: var(--navy);
+	font-size: .78rem;
+	font-weight: 700;
+}
+
+.add-employee input,
+.add-employee select {
+	width: 100%;
+	min-height: 2.8rem;
+	padding: .65rem .75rem;
+	border: 1px solid #b9cbd4;
+	border-radius: 0;
+	color: var(--navy);
+	background: #f8fbfc;
+	font: .9rem var(--display-font);
+}
+
+.add-employee input:focus,
+.add-employee select:focus {
+	outline: 2px solid #16a68d;
+	outline-offset: 2px;
+}
+
+.add-employee input[aria-invalid='true'],
+.add-employee select[aria-invalid='true'] {
+	border-color: #b42318;
+}
+
+.form-error {
+	color: #b42318;
+	font-size: .75rem;
+	font-weight: 500;
+}
+
+.add-employee button {
+	min-height: 2.8rem;
+	margin-top: 1.3rem;
+	padding: .65rem 1rem;
+	border: 0;
+	border-radius: 0;
+	color: var(--white);
+	background: #16a68d;
+	font: 700 .78rem var(--display-font);
+	cursor: pointer;
+}
+
+.add-employee button:hover {
+	background: #11826f;
+}
+
 footer {
 	padding: 1.5rem;
 	color: var(--muted-blue);
@@ -186,5 +270,20 @@ footer {
 	.department,
 	.department:first-child {
 		grid-column: 1 / -1;
+	}
+
+	.add-employee {
+		width: min(100% - 2rem, 40rem);
+		padding: 1.25rem;
+	}
+
+	.add-employee-intro,
+	.add-employee form {
+		display: grid;
+		grid-template-columns: 1fr;
+	}
+
+	.add-employee button {
+		margin-top: 0;
 	}
 }
