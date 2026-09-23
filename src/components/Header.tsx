@@ -1,12 +1,23 @@
 import type { ReactElement } from 'react';
 import logoUrl from '../assets/logo.svg';
 
-export function Header(): ReactElement {
+interface HeaderProps {
+  pageTitle: string;
+  intro: string;
+}
+
+export function Header({ pageTitle, intro }: HeaderProps): ReactElement {
+  const currentPath = window.location.pathname;
+
   return (
     <header className="site-header">
       <img src={logoUrl} alt="Pixell River Financial logo" className="brand-mark" />
-      <h1>Employee Directory</h1>
-      <p className="header-intro">Pixell River Financial staff directory</p>
+      <nav className="site-nav" aria-label="Main navigation">
+        <a className={currentPath === '/employees' || currentPath === '/' ? 'active' : ''} href="/employees">Employees</a>
+        <a className={currentPath === '/organization' ? 'active' : ''} href="/organization">Organization</a>
+      </nav>
+      <h1>{pageTitle}</h1>
+      <p className="header-intro">{intro}</p>
     </header>
   );
 }
