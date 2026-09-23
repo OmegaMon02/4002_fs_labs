@@ -1,0 +1,32 @@
+name: Push Update to Target Repo
+
+on:
+  push:
+    branches:
+      - main # Triggers whenever you push to main in this repo
+
+jobs:
+  copy-to-other-repo:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Source Repo
+        uses: actions/checkout@v4
+
+      - name: Push to Target Repo
+        env:
+          API_TOKEN_GITHUB: ${{ secrets.TARGET_REPO_TOKEN }}
+        run: |
+          git config --global user.name "GitHub Action"
+          git config --global user.email "action@github.com"
+
+          # Clone the target repository into a temporary folder
+          git clone https://x-access-token:${API_TOKEN_GITHUB}@github.com/OmegaMon02/4002_fs_labs_vercel.git target-folder
+
+          # Copy the source files without replacing the target repository metadata
+          rsync -av --exclude='.git' ./ target-folder/
+
+          # Navigate to target folder, commit, and push
+          cd target-folder
+          git add .
+          git commit -m "Auto-update from source repo: $GITHUB_SHA" || exit 0
+          git push origin main
