@@ -1,49 +1,39 @@
-import { useState, type FormEvent, type ReactElement } from 'react';
+import type { FormEvent, ReactElement } from 'react';
+import { useFormInput } from '../hooks/useFormInput';
+import { employeeService } from '../services/employeeService';
 import type { Department, Employee } from '../types';
 
 interface AddEmployeeFormProps {
   departments: Department[];
-  onAddEmployee: (departmentName: string, employee: Employee) => void;
+  onEmployeeAdded: () => void;
 }
 
-interface FormErrors {
-  firstName?: string;
-  department?: string;
-}
-
-export function AddEmployeeForm({ departments, onAddEmployee }: AddEmployeeFormProps): ReactElement {
-  const [firstName, setFirstName] = useState('');
-  const [lastName, setLastName] = useState('');
-  const [title, setTitle] = useState('');
-  const [departmentName, setDepartmentName] = useState('');
-  const [errors, setErrors] = useState<FormErrors>({});
+export function AddEmployeeForm({ departments, onEmployeeAdded }: AddEmployeeFormProps): ReactElement {
+  const firstName = useFormInput('');
+  const lastName = useFormInput('');
+  const title = useFormInput('');
+  const departmentName = useFormInput('');
 
   function handleSubmit(event: FormEvent<HTMLFormElement>): void {
     event.preventDefault();
-    setErrors({});
+    const employee: Employee = {
+      firstName: firstName.value,
+      lastName: lastName.value,
+      ...(title.value.trim() ? { title: title.value } : {}),
+    };
+    const result = employeeService.createEmployee(departmentName.value, employee);
 
-    const nextErrors: FormErrors = {};
-    if (firstName.trim().length < 3) {
-      nextErrors.firstName = 'First name must be at least 3 characters.';
-    }
-    if (!departmentName) {
-      nextErrors.department = 'Select a department.';
-    }
-
-    if (Object.keys(nextErrors).length > 0) {
-      setErrors(nextErrors);
+    if (!result.success) {
+      firstName.validate(() => result.errors.firstName ? [result.errors.firstName] : []);
+      departmentName.validate(() => result.errors.department ? [result.errors.department] : []);
       return;
     }
 
-    onAddEmployee(departmentName, {
-      firstName: firstName.trim(),
-      lastName: lastName.trim(),
-      ...(title.trim() ? { title: title.trim() } : {}),
-    });
-    setFirstName('');
-    setLastName('');
-    setTitle('');
-    setDepartmentName('');
+    firstName.reset();
+    lastName.reset();
+    title.reset();
+    departmentName.reset();
+    onEmployeeAdded();
   }
 
   return (
@@ -57,33 +47,33 @@ export function AddEmployeeForm({ departments, onAddEmployee }: AddEmployeeFormP
           First name
           <input
             type="text"
-            value={firstName}
-            onChange={(event) => setFirstName(event.target.value)}
-            aria-invalid={Boolean(errors.firstName)}
-            aria-describedby={errors.firstName ? 'first-name-error' : undefined}
+            value={firstName.value}
+            onChange={(event) => firstName.setValue(event.target.value)}
+            aria-invalid={firstName.messages.length > 0}
+            aria-describedby={firstName.messages.length > 0 ? 'first-name-error' : undefined}
           />
-          {errors.firstName && <span className="form-error" id="first-name-error">{errors.firstName}</span>}
+          {firstName.messages[0] && <span className="form-error" id="first-name-error">{firstName.messages[0]}</span>}
         </label>
         <label>
           Last name
-          <input type="text" value={lastName} onChange={(event) => setLastName(event.target.value)} />
+          <input type="text" value={lastName.value} onChange={(event) => lastName.setValue(event.target.value)} />
         </label>
         <label>
           Title <span className="optional">(optional)</span>
-          <input type="text" value={title} onChange={(event) => setTitle(event.target.value)} />
+          <input type="text" value={title.value} onChange={(event) => title.setValue(event.target.value)} />
         </label>
         <label>
           Department
           <select
-            value={departmentName}
-            onChange={(event) => setDepartmentName(event.target.value)}
-            aria-invalid={Boolean(errors.department)}
-            aria-describedby={errors.department ? 'department-error' : undefined}
+            value={departmentName.value}
+            onChange={(event) => departmentName.setValue(event.target.value)}
+            aria-invalid={departmentName.messages.length > 0}
+            aria-describedby={departmentName.messages.length > 0 ? 'department-error' : undefined}
           >
             <option value="">Select a department</option>
             {departments.map((department) => <option key={department.name} value={department.name}>{department.name}</option>)}
           </select>
-          {errors.department && <span className="form-error" id="department-error">{errors.department}</span>}
+          {departmentName.messages[0] && <span className="form-error" id="department-error">{departmentName.messages[0]}</span>}
         </label>
         <button type="submit">Add employee</button>
       </form>
