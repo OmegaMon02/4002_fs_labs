@@ -4,12 +4,12 @@ import { AddEmployeeForm } from './components/AddEmployeeForm';
 import { Footer } from './components/Footer';
 import { Header } from './components/Header';
 import { Organization } from './components/Organization';
-import { departments as initialDepartments } from './data/departments';
 import { organizationRoles } from './data/organization';
-import type { Department, Employee } from './types';
+import { employeeService } from './services/employeeService';
+import type { Department } from './types';
 
 export function App(): ReactElement {
-  const [departments, setDepartments] = useState<Department[]>(initialDepartments);
+  const [departments, setDepartments] = useState<Department[]>(() => employeeService.getDepartments());
   const [path, setPath] = useState(window.location.pathname);
 
   useEffect(() => {
@@ -21,12 +21,8 @@ export function App(): ReactElement {
     return () => window.removeEventListener('popstate', updatePath);
   }, []);
 
-  function addEmployee(departmentName: string, employee: Employee): void {
-    setDepartments((currentDepartments) => currentDepartments.map((department) => (
-      department.name === departmentName
-        ? { ...department, employees: [...department.employees, employee] }
-        : department
-    )));
+  function refreshDepartments(): void {
+    setDepartments(employeeService.getDepartments());
   }
 
   return (
@@ -40,7 +36,7 @@ export function App(): ReactElement {
       ) : (
         <>
           <EmployeeDirectory departments={departments} />
-          <AddEmployeeForm departments={departments} onAddEmployee={addEmployee} />
+          <AddEmployeeForm departments={departments} onEmployeeAdded={refreshDepartments} />
         </>
       )}
       <Footer />
