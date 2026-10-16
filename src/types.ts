@@ -10,6 +10,10 @@ export interface Role {
   role: string;
 }
 
+export interface OrganizationRecord extends Role {
+  id: string;
+}
+
 export interface Department {
   name: string;
   employees: Employee[];
