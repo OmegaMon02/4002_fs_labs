@@ -209,7 +209,8 @@ li:last-child {
 }
 
 /* Add employee form */
-.add-employee {
+.add-employee,
+.add-organization-role {
 	width: min(86rem, calc(100% - 3rem));
 	margin: 0 auto 5rem;
 	padding: 2rem;
@@ -217,7 +218,8 @@ li:last-child {
 	background: var(--white);
 }
 
-.add-employee-intro {
+.add-employee-intro,
+.add-organization-role-intro {
 	display: flex;
 	align-items: baseline;
 	gap: 1rem;
@@ -232,11 +234,16 @@ li:last-child {
 	text-transform: uppercase;
 }
 
-.add-employee form {
+.add-employee form,
+.add-organization-role form {
 	display: grid;
 	grid-template-columns: repeat(4, 1fr) auto;
 	align-items: start;
 	gap: 1rem;
+}
+
+.add-organization-role form {
+	grid-template-columns: repeat(3, minmax(0, 1fr)) auto;
 }
 
 .add-employee label {
@@ -247,8 +254,17 @@ li:last-child {
 	font-weight: 700;
 }
 
+.add-organization-role label {
+	display: grid;
+	gap: .45rem;
+	color: var(--navy);
+	font-size: .78rem;
+	font-weight: 700;
+}
+
 .add-employee input,
-.add-employee select {
+.add-employee select,
+.add-organization-role input {
 	width: 100%;
 	min-height: 2.8rem;
 	padding: .65rem .75rem;
@@ -260,13 +276,15 @@ li:last-child {
 }
 
 .add-employee input:focus,
-.add-employee select:focus {
+.add-employee select:focus,
+.add-organization-role input:focus {
 	outline: 2px solid #16a68d;
 	outline-offset: 2px;
 }
 
 .add-employee input[aria-invalid='true'],
-.add-employee select[aria-invalid='true'] {
+.add-employee select[aria-invalid='true'],
+.add-organization-role input[aria-invalid='true'] {
 	border-color: #b42318;
 }
 
@@ -276,7 +294,8 @@ li:last-child {
 	font-weight: 500;
 }
 
-.add-employee button {
+.add-employee button,
+.add-organization-role button {
 	min-height: 2.8rem;
 	margin-top: 1.3rem;
 	padding: .65rem 1rem;
@@ -288,7 +307,8 @@ li:last-child {
 	cursor: pointer;
 }
 
-.add-employee button:hover {
+.add-employee button:hover,
+.add-organization-role button:hover {
 	background: #11826f;
 }
 
@@ -327,7 +347,8 @@ footer {
 		grid-column: 1 / -1;
 	}
 
-	.add-employee {
+	.add-employee,
+	.add-organization-role {
 		width: min(100% - 2rem, 40rem);
 		padding: 1.25rem;
 	}
@@ -339,12 +360,15 @@ footer {
 	}
 
 	.add-employee-intro,
-	.add-employee form {
+	.add-employee form,
+	.add-organization-role-intro,
+	.add-organization-role form {
 		display: grid;
 		grid-template-columns: 1fr;
 	}
 
-	.add-employee button {
+	.add-employee button,
+	.add-organization-role button {
 		margin-top: 0;
 	}
 }

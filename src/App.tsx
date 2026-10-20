@@ -1,15 +1,17 @@
 import { useEffect, useState, type ReactElement } from 'react';
 import { EmployeeDirectory } from './components/EmployeeDirectory';
 import { AddEmployeeForm } from './components/AddEmployeeForm';
+import { AddOrganizationRoleForm } from './components/AddOrganizationRoleForm';
 import { Footer } from './components/Footer';
 import { Header } from './components/Header';
 import { Organization } from './components/Organization';
-import { organizationRoles } from './data/organization';
 import { employeeService } from './services/employeeService';
-import type { Department } from './types';
+import { organizationService } from './services/organizationService';
+import type { Department, OrganizationRecord } from './types';
 
 export function App(): ReactElement {
   const [departments, setDepartments] = useState<Department[]>(() => employeeService.getDepartments());
+  const [organizationRoles, setOrganizationRoles] = useState<OrganizationRecord[]>(() => organizationService.getOrganization());
   const [path, setPath] = useState(window.location.pathname);
 
   useEffect(() => {
@@ -25,6 +27,10 @@ export function App(): ReactElement {
     setDepartments(employeeService.getDepartments());
   }
 
+  function refreshOrganization(): void {
+    setOrganizationRoles(organizationService.getOrganization());
+  }
+
   return (
     <div className="app-shell">
       <Header
@@ -32,7 +38,10 @@ export function App(): ReactElement {
         intro={path === '/organization' ? 'Pixell River Financial leadership and management' : 'Pixell River Financial staff directory'}
       />
       {path === '/organization' ? (
-        <Organization roles={organizationRoles} />
+        <>
+          <Organization roles={organizationRoles} />
+          <AddOrganizationRoleForm onRoleCreated={refreshOrganization} />
+        </>
       ) : (
         <>
           <EmployeeDirectory departments={departments} />
