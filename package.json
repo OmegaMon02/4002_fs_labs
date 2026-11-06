@@ -11,7 +11,7 @@
     "start:backend": "npm run dev --workspace=@complexicon/backend",
     "dev": "concurrently \"npm run start:frontend\" \"npm run start:backend\"",
     "build": "npm run build --workspace=@complexicon/frontend && npm run build --workspace=@complexicon/backend",
-    "lint": "npm run lint --workspace=@complexicon/frontend"
+    "lint": "npm run lint --workspace=@complexicon/frontend && npm run lint --workspace=@complexicon/backend"
   },
   "dependencies": {
     "dotenv": "^16.4.7"
