@@ -1,4 +1,4 @@
-import type { Role } from '../types';
+import type { Role } from '../types.js';
 
 export const organizationRoles: Role[] = [
   { firstName: 'Jo-Anne', lastName: 'Sinclair', role: 'CEO/Chair of Board' },

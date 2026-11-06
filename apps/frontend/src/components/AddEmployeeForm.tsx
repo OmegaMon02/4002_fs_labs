@@ -1,39 +1,52 @@
-import type { FormEvent, ReactElement } from 'react';
+import { useState, type FormEvent, type ReactElement } from 'react';
 import { useFormInput } from '../hooks/useFormInput';
 import { employeeService } from '../services/employeeService';
 import type { Department, Employee } from '../types';
 
 interface AddEmployeeFormProps {
   departments: Department[];
-  onEmployeeAdded: () => void;
+  onEmployeeAdded: () => Promise<void>;
 }
 
 export function AddEmployeeForm({ departments, onEmployeeAdded }: AddEmployeeFormProps): ReactElement {
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [requestError, setRequestError] = useState('');
   const firstName = useFormInput('');
   const lastName = useFormInput('');
   const title = useFormInput('');
   const departmentName = useFormInput('');
 
-  function handleSubmit(event: FormEvent<HTMLFormElement>): void {
+  async function handleSubmit(event: FormEvent<HTMLFormElement>): Promise<void> {
     event.preventDefault();
+    setIsSubmitting(true);
+    setRequestError('');
     const employee: Employee = {
       firstName: firstName.value,
       lastName: lastName.value,
       ...(title.value.trim() ? { title: title.value } : {}),
     };
-    const result = employeeService.createEmployee(departmentName.value, employee);
+    try {
+      const result = await employeeService.createEmployee(departmentName.value, employee);
 
-    if (!result.success) {
-      firstName.validate(() => result.errors.firstName ? [result.errors.firstName] : []);
-      departmentName.validate(() => result.errors.department ? [result.errors.department] : []);
-      return;
+      if (!result.success) {
+        firstName.validate(() => result.errors.firstName ? [result.errors.firstName] : []);
+        departmentName.validate(() => result.errors.department ? [result.errors.department] : []);
+        if (result.message) {
+          setRequestError(result.message);
+        }
+        return;
+      }
+
+      firstName.reset();
+      lastName.reset();
+      title.reset();
+      departmentName.reset();
+      await onEmployeeAdded();
+    } catch (error) {
+      setRequestError(error instanceof Error ? error.message : 'Could not add the employee.');
+    } finally {
+      setIsSubmitting(false);
     }
-
-    firstName.reset();
-    lastName.reset();
-    title.reset();
-    departmentName.reset();
-    onEmployeeAdded();
   }
 
   return (
@@ -43,6 +56,7 @@ export function AddEmployeeForm({ departments, onEmployeeAdded }: AddEmployeeFor
         <h2 id="add-employee-heading">Add an employee</h2>
       </div>
       <form onSubmit={handleSubmit} noValidate>
+        {requestError && <p className="form-error" role="alert">{requestError}</p>}
         <label>
           First name
           <input
@@ -75,7 +89,7 @@ export function AddEmployeeForm({ departments, onEmployeeAdded }: AddEmployeeFor
           </select>
           {departmentName.messages[0] && <span className="form-error" id="department-error">{departmentName.messages[0]}</span>}
         </label>
-        <button type="submit">Add employee</button>
+        <button type="submit" disabled={isSubmitting}>{isSubmitting ? 'Adding...' : 'Add employee'}</button>
       </form>
     </section>
   );

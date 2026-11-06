@@ -312,6 +312,12 @@ li:last-child {
 	background: #11826f;
 }
 
+.add-employee button:disabled,
+.add-organization-role button:disabled {
+	opacity: .65;
+	cursor: wait;
+}
+
 footer {
 	padding: 1.5rem;
 	color: var(--muted-blue);
