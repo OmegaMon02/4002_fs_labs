@@ -1,8 +1,11 @@
-import 'dotenv/config';
 import cors from 'cors';
+import dotenv from 'dotenv';
 import express, { type ErrorRequestHandler } from 'express';
+import { fileURLToPath } from 'node:url';
 import { employeeRoutes } from './routes/employee.routes.js';
 import { roleRoutes } from './routes/role.routes.js';
+
+dotenv.config({ path: fileURLToPath(new URL('../.env', import.meta.url)) });
 
 const allowedOrigins = new Set(
   (process.env.FRONTEND_URL ?? 'http://localhost:5173')

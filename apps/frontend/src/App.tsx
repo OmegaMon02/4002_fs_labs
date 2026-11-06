@@ -10,9 +10,38 @@ import { organizationService } from './services/organizationService';
 import type { Department, OrganizationRecord } from './types';
 
 export function App(): ReactElement {
-  const [departments, setDepartments] = useState<Department[]>(() => employeeService.getDepartments());
-  const [organizationRoles, setOrganizationRoles] = useState<OrganizationRecord[]>(() => organizationService.getOrganization());
+  const [departments, setDepartments] = useState<Department[]>([]);
+  const [organizationRoles, setOrganizationRoles] = useState<OrganizationRecord[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [loadError, setLoadError] = useState('');
   const [path, setPath] = useState(window.location.pathname);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    Promise.all([employeeService.getDepartments(), organizationService.getOrganization()])
+      .then(([loadedDepartments, loadedRoles]) => {
+        if (isMounted) {
+          setDepartments(loadedDepartments);
+          setOrganizationRoles(loadedRoles);
+          setLoadError('');
+        }
+      })
+      .catch((error: unknown) => {
+        if (isMounted) {
+          setLoadError(error instanceof Error ? error.message : 'Could not load data from the server.');
+        }
+      })
+      .finally(() => {
+        if (isMounted) {
+          setIsLoading(false);
+        }
+      });
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   useEffect(() => {
     function updatePath(): void {
@@ -23,12 +52,39 @@ export function App(): ReactElement {
     return () => window.removeEventListener('popstate', updatePath);
   }, []);
 
-  function refreshDepartments(): void {
-    setDepartments(employeeService.getDepartments());
+  async function refreshDepartments(): Promise<void> {
+    try {
+      setDepartments(await employeeService.getDepartments());
+      setLoadError('');
+    } catch (error) {
+      setLoadError(error instanceof Error ? error.message : 'Could not refresh employee data.');
+    }
   }
 
-  function refreshOrganization(): void {
-    setOrganizationRoles(organizationService.getOrganization());
+  async function refreshOrganization(): Promise<void> {
+    try {
+      setOrganizationRoles(await organizationService.getOrganization());
+      setLoadError('');
+    } catch (error) {
+      setLoadError(error instanceof Error ? error.message : 'Could not refresh organization data.');
+    }
+  }
+
+  async function retryLoading(): Promise<void> {
+    setIsLoading(true);
+    setLoadError('');
+    try {
+      const [loadedDepartments, loadedRoles] = await Promise.all([
+        employeeService.getDepartments(),
+        organizationService.getOrganization(),
+      ]);
+      setDepartments(loadedDepartments);
+      setOrganizationRoles(loadedRoles);
+    } catch (error) {
+      setLoadError(error instanceof Error ? error.message : 'Could not load data from the server.');
+    } finally {
+      setIsLoading(false);
+    }
   }
 
   return (
@@ -37,7 +93,14 @@ export function App(): ReactElement {
         pageTitle={path === '/organization' ? 'Organization' : 'Employee Directory'}
         intro={path === '/organization' ? 'Pixell River Financial leadership and management' : 'Pixell River Financial staff directory'}
       />
-      {path === '/organization' ? (
+      {isLoading ? (
+        <main className="directory" role="status">Loading data from the server...</main>
+      ) : loadError ? (
+        <main className="directory" role="alert">
+          <p className="form-error">{loadError}</p>
+          <button type="button" onClick={() => void retryLoading()}>Try again</button>
+        </main>
+      ) : path === '/organization' ? (
         <>
           <Organization roles={organizationRoles} />
           <AddOrganizationRoleForm onRoleCreated={refreshOrganization} />

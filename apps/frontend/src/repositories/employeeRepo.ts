@@ -1,33 +1,12 @@
-import { departments as initialDepartments } from '../data/departments';
 import type { Department, Employee } from '../types';
-
-function copyDepartment(department: Department): Department {
-  return {
-    name: department.name,
-    employees: department.employees.map((employee) => ({ ...employee })),
-  };
-}
-
-let storedDepartments = initialDepartments.map(copyDepartment);
+import { jsonRequest, request } from './api';
 
 export const employeeRepo = {
-  getDepartments(): Department[] {
-    return storedDepartments.map(copyDepartment);
+  getDepartments(): Promise<Department[]> {
+    return request<Department[]>('/api/employees/departments');
   },
 
-  getEmployeesByDepartment(departmentName: string): Employee[] {
-    const department = storedDepartments.find((item) => item.name === departmentName);
-    return department?.employees.map((employee) => ({ ...employee })) ?? [];
-  },
-
-  createEmployee(departmentName: string, employee: Employee): Employee | undefined {
-    const department = storedDepartments.find((item) => item.name === departmentName);
-    if (!department) {
-      return undefined;
-    }
-
-    const createdEmployee = { ...employee };
-    department.employees.push(createdEmployee);
-    return { ...createdEmployee };
+  createEmployee(departmentName: string, employee: Employee): Promise<Employee> {
+    return request<Employee>('/api/employees', jsonRequest('POST', { departmentName, employee }));
   },
 };

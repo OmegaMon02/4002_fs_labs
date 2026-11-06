@@ -1,10 +1,10 @@
-import type { FormEvent, ReactElement } from 'react';
+import { useState, type FormEvent, type ReactElement } from 'react';
 import { useForm } from '../hooks/useForm';
 import { organizationService, type OrganizationField } from '../services/organizationService';
 import type { OrganizationRecord } from '../types';
 
 interface AddOrganizationRoleFormProps {
-  onRoleCreated: () => void;
+  onRoleCreated: () => Promise<void>;
 }
 
 interface OrganizationFormValues {
@@ -16,14 +16,21 @@ interface OrganizationFormValues {
 const initialValues: OrganizationFormValues = { firstName: '', lastName: '', role: '' };
 
 export function AddOrganizationRoleForm({ onRoleCreated }: AddOrganizationRoleFormProps): ReactElement {
+  const [requestError, setRequestError] = useState('');
   const form = useForm<OrganizationFormValues, OrganizationRecord, OrganizationField>(
     initialValues,
     ({ firstName, lastName, role }) => organizationService.createPerson(firstName, lastName, role),
   );
 
-  function handleSubmit(event: FormEvent<HTMLFormElement>): void {
-    if (form.handleSubmit(event)) {
-      onRoleCreated();
+  async function handleSubmit(event: FormEvent<HTMLFormElement>): Promise<void> {
+    setRequestError('');
+    const createdRole = await form.handleSubmit(event);
+    if (createdRole) {
+      try {
+        await onRoleCreated();
+      } catch (error) {
+        setRequestError(error instanceof Error ? error.message : 'Could not refresh organization data.');
+      }
     }
   }
 
@@ -34,6 +41,8 @@ export function AddOrganizationRoleForm({ onRoleCreated }: AddOrganizationRoleFo
         <h2 id="add-organization-role-heading">Add a role holder</h2>
       </div>
       <form onSubmit={handleSubmit} noValidate>
+        {requestError && <p className="form-error" role="alert">{requestError}</p>}
+        {form.submitError && <p className="form-error" role="alert">{form.submitError}</p>}
         <label>
           First name
           <input
@@ -67,7 +76,7 @@ export function AddOrganizationRoleForm({ onRoleCreated }: AddOrganizationRoleFo
           />
           {form.errors.role && <span className="form-error" id="organization-role-error">{form.errors.role}</span>}
         </label>
-        <button type="submit">Add role holder</button>
+        <button type="submit" disabled={form.isSubmitting}>{form.isSubmitting ? 'Adding...' : 'Add role holder'}</button>
       </form>
     </section>
   );
