@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "tsx watch src/server.ts",
     "start": "tsx src/server.ts",
-    "build": "tsc -b",
+    "build": "prisma generate && tsc -b",
     "lint": "oxlint",
     "db:generate": "prisma generate",
     "db:migrate": "prisma migrate dev",
