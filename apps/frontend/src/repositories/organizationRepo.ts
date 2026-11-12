@@ -6,7 +6,7 @@ export const organizationRepo = {
     return request<OrganizationRecord[]>('/api/roles');
   },
 
-  create(record: Omit<OrganizationRecord, 'id'>): Promise<OrganizationRecord> {
+  create(record: Omit<OrganizationRecord, 'id'> & { departmentName: string }): Promise<OrganizationRecord> {
     return request<OrganizationRecord>('/api/roles', jsonRequest('POST', record));
   },
 };

@@ -2,12 +2,12 @@ import type { Request, Response } from 'express';
 import { employeeService } from '../services/employee.service.js';
 
 export const employeeController = {
-  getDepartments(_request: Request, response: Response): void {
-    response.json(employeeService.getDepartments());
+  async getDepartments(_request: Request, response: Response): Promise<void> {
+    response.json(await employeeService.getDepartments());
   },
 
-  createEmployee(request: Request, response: Response): void {
-    const result = employeeService.createEmployee(request.body);
+  async createEmployee(request: Request, response: Response): Promise<void> {
+    const result = await employeeService.createEmployee(request.body);
     if (!result.success) {
       response.status(400).json({ message: 'Employee could not be created.', errors: result.errors });
       return;

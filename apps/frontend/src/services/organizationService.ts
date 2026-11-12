@@ -2,7 +2,7 @@ import { organizationRepo } from '../repositories/organizationRepo';
 import { ApiError } from '../repositories/api';
 import type { OrganizationRecord } from '../types';
 
-export type OrganizationField = 'firstName' | 'lastName' | 'role';
+export type OrganizationField = 'firstName' | 'lastName' | 'role' | 'departmentName';
 
 export type CreateOrganizationResult =
   | { success: true; data: OrganizationRecord }
@@ -13,12 +13,18 @@ export const organizationService = {
     return organizationRepo.getAll();
   },
 
-  async createPerson(firstName: string, lastName: string, role: string): Promise<CreateOrganizationResult> {
+  async createPerson(
+    firstName: string,
+    lastName: string,
+    role: string,
+    departmentName: string,
+  ): Promise<CreateOrganizationResult> {
     try {
       const data = await organizationRepo.create({
         firstName,
         lastName,
         role,
+        departmentName,
       });
       return { success: true, data };
     } catch (error) {
@@ -32,6 +38,9 @@ export const organizationService = {
         }
         if (error.errors.role) {
           errors.role = error.errors.role;
+        }
+        if (error.errors.departmentName) {
+          errors.departmentName = error.errors.departmentName;
         }
         return { success: false, errors, ...(Object.keys(errors).length === 0 ? { message: error.message } : {}) };
       }
