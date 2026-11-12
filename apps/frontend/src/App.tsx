@@ -61,13 +61,14 @@ export function App(): ReactElement {
     }
   }
 
-  async function refreshOrganization(): Promise<void> {
-    try {
-      setOrganizationRoles(await organizationService.getOrganization());
-      setLoadError('');
-    } catch (error) {
-      setLoadError(error instanceof Error ? error.message : 'Could not refresh organization data.');
-    }
+  async function refreshOrganizationAndDepartments(): Promise<void> {
+    const [loadedDepartments, loadedRoles] = await Promise.all([
+      employeeService.getDepartments(),
+      organizationService.getOrganization(),
+    ]);
+    setDepartments(loadedDepartments);
+    setOrganizationRoles(loadedRoles);
+    setLoadError('');
   }
 
   async function retryLoading(): Promise<void> {
@@ -103,7 +104,10 @@ export function App(): ReactElement {
       ) : path === '/organization' ? (
         <>
           <Organization roles={organizationRoles} />
-          <AddOrganizationRoleForm onRoleCreated={refreshOrganization} />
+          <AddOrganizationRoleForm
+            departments={departments}
+            onRoleCreated={refreshOrganizationAndDepartments}
+          />
         </>
       ) : (
         <>

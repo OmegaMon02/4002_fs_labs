@@ -19,11 +19,11 @@ function isEmployeeInput(value: unknown): value is Employee {
 }
 
 export const employeeService = {
-  getDepartments(): Department[] {
+  getDepartments(): Promise<Department[]> {
     return employeeRepository.getDepartments();
   },
 
-  createEmployee(input: unknown): CreateEmployeeResult {
+  async createEmployee(input: unknown): Promise<CreateEmployeeResult> {
     if (!isRecord(input)) {
       return { success: false, errors: { firstName: 'Enter valid employee details.' } };
     }
@@ -32,12 +32,6 @@ export const employeeService = {
     const departmentName = typeof input.departmentName === 'string' ? input.departmentName : '';
     const errors: Partial<Record<EmployeeField, string>> = {};
 
-    if (
-      !employeeRepository.getDepartments().some((department) => department.name === departmentName)
-    ) {
-      errors.department = 'Select a valid department.';
-    }
-
     if (!isEmployeeInput(employee)) {
       errors.firstName = 'Enter valid employee details.';
       return { success: false, errors };
@@ -45,6 +39,10 @@ export const employeeService = {
 
     if (employee.firstName.trim().length < 3) {
       errors.firstName = 'First name must be at least 3 characters.';
+    }
+
+    if (!departmentName || !(await employeeRepository.departmentExists(departmentName))) {
+      errors.department = 'Select a valid department.';
     }
 
     if (Object.keys(errors).length > 0) {
@@ -58,7 +56,7 @@ export const employeeService = {
         ? { title: employee.title.trim() }
         : {}),
     };
-    const createdEmployee = employeeRepository.createEmployee(departmentName, normalizedEmployee);
+    const createdEmployee = await employeeRepository.createEmployee(departmentName, normalizedEmployee);
 
     if (!createdEmployee) {
       return { success: false, errors: { department: 'Select a valid department.' } };

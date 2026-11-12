@@ -1,9 +1,10 @@
 import { useState, type FormEvent, type ReactElement } from 'react';
 import { useForm } from '../hooks/useForm';
 import { organizationService, type OrganizationField } from '../services/organizationService';
-import type { OrganizationRecord } from '../types';
+import type { Department, OrganizationRecord } from '../types';
 
 interface AddOrganizationRoleFormProps {
+  departments: Department[];
   onRoleCreated: () => Promise<void>;
 }
 
@@ -11,15 +12,17 @@ interface OrganizationFormValues {
   firstName: string;
   lastName: string;
   role: string;
+  departmentName: string;
 }
 
-const initialValues: OrganizationFormValues = { firstName: '', lastName: '', role: '' };
+const initialValues: OrganizationFormValues = { firstName: '', lastName: '', role: '', departmentName: '' };
 
-export function AddOrganizationRoleForm({ onRoleCreated }: AddOrganizationRoleFormProps): ReactElement {
+export function AddOrganizationRoleForm({ departments, onRoleCreated }: AddOrganizationRoleFormProps): ReactElement {
   const [requestError, setRequestError] = useState('');
   const form = useForm<OrganizationFormValues, OrganizationRecord, OrganizationField>(
     initialValues,
-    ({ firstName, lastName, role }) => organizationService.createPerson(firstName, lastName, role),
+    ({ firstName, lastName, role, departmentName }) =>
+      organizationService.createPerson(firstName, lastName, role, departmentName),
   );
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>): Promise<void> {
@@ -75,6 +78,23 @@ export function AddOrganizationRoleForm({ onRoleCreated }: AddOrganizationRoleFo
             aria-describedby={form.errors.role ? 'organization-role-error' : undefined}
           />
           {form.errors.role && <span className="form-error" id="organization-role-error">{form.errors.role}</span>}
+        </label>
+        <label>
+          Department
+          <select
+            value={form.values.departmentName}
+            onChange={(event) => form.setField('departmentName', event.target.value)}
+            aria-invalid={Boolean(form.errors.departmentName)}
+            aria-describedby={form.errors.departmentName ? 'organization-department-error' : undefined}
+          >
+            <option value="">Select a department</option>
+            {departments.map((department) => (
+              <option key={department.name} value={department.name}>{department.name}</option>
+            ))}
+          </select>
+          {form.errors.departmentName && (
+            <span className="form-error" id="organization-department-error">{form.errors.departmentName}</span>
+          )}
         </label>
         <button type="submit" disabled={form.isSubmitting}>{form.isSubmitting ? 'Adding...' : 'Add role holder'}</button>
       </form>
